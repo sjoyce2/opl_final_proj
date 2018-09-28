@@ -81,9 +81,10 @@ invokes parseInput and returns the parsed input to main
 */
 char** getInput()
 {
-  char **userInput = (char**) malloc(5*sizeof(char*));
-  char cmdText[80];
-  fgets(cmdText, 80, stdin);
+  char buf[MAX_LINE];
+  fgets(cmdText, MAX_LINE, stdin);
+  int numWords = wc(buf);	
+  char **userInput = (char**) malloc(numWords*sizeof(char*));
   userInput = parseInput(cmdText);
   return userInput;
 }  
@@ -98,22 +99,22 @@ myShell>cp x y
 char** parseInput(char* inp)
 {
   char **args = (char**) malloc(5*sizeof(char*));
-  char *tmp;
-  int tmpCount = 0;
-  int cmdCount = 0;
-  tmp = (char*) malloc(10*sizeof(char));
+  int numWords = 0;
+  int prevStop = -1;
 
   for (int i = 0; i < strlen(inp); i++) {
     if (inp[i] == ' ') {
-      //add tmp to args
-      tmp[tmpCount] = '\0';
-      args[cmdCount] = tmp;
-      tmpCount = 0;
+      inp[i] = '\0';
+      args[numWords] = (char*) malloc((i - prevStop)*sizeof(char));
+      strcpy(args[numWords], inp + (prevStop + 1));
+      prevStop = i;
+      numWords++;
     } else if (inp[i] == '\0') {
       // add tmp to args and break;
-      tmp[tmpCount] = '\0';
-      args[cmdCount] = tmp;
-      tmpCount = 0;
+      inp[i] = '\0';
+      args[numWords] = (char*) malloc((i - prevStop)*sizeof(char));
+      strcpy(args[numWords], inp + (prevStop + 1));
+      numWords++;
       break;
     } else {
       // add inp[i] to tmp
@@ -132,4 +133,27 @@ void dispOutput(char** args)
   for (int i = 0; i < sizeof(args); i++) {
     printf("%s", args[i]);
   }
+}
+
+int wc(char* inp) {
+  int count = 0;
+  int strProg = 0;
+  char c;
+  while (inp[strProg] != '\0') {
+    int letterCount = 0;
+    while (inp[strProg] != ' ' && inp[strProg] != '\0') {
+      letterCount++;
+      strProg++;
+    }
+    if (letterCount != 0) {
+      count++;
+    }
+    if (inp[strProg] == '\0') {
+      return count;
+    }
+    while (inp[strProg] == ' ') {
+      strProg++;
+    }
+  }
+  return count;
 }
