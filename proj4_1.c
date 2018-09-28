@@ -14,6 +14,7 @@ Outline of a shell
 char** getInput();
 char** parseInput(char*);
 void dispOutput(char**);
+int wc(char*);
 
 int main(int argc, char* argv[])
 {
@@ -82,10 +83,10 @@ invokes parseInput and returns the parsed input to main
 char** getInput()
 {
   char buf[MAX_LINE];
-  fgets(cmdText, MAX_LINE, stdin);
+  fgets(buf, MAX_LINE, stdin);
   int numWords = wc(buf);	
   char **userInput = (char**) malloc(numWords*sizeof(char*));
-  userInput = parseInput(cmdText);
+  userInput = parseInput(buf);
   return userInput;
 }  
 
@@ -116,10 +117,6 @@ char** parseInput(char* inp)
       strcpy(args[numWords], inp + (prevStop + 1));
       numWords++;
       break;
-    } else {
-      // add inp[i] to tmp
-      tmp[tmpCount] = inp[i];
-      tmpCount++;
     }
   }
   return args;
